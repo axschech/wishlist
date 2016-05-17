@@ -1,0 +1,34 @@
+import requests
+import json
+from bs4 import BeautifulSoup
+
+
+wishlist_url = 'http://steamcommunity.com/profiles/76561197968229753/wishlist/'
+gamedeals_url = 'https://www.reddit.com/r/GameDeals/top.json'
+def getSteamWishList():
+    true_wishlist = []
+    r = requests.get(wishlist_url)
+    parsed_html = BeautifulSoup(r.text, "html.parser");
+    for x in parsed_html.body.findAll('div', attrs={'class':'wishlistRow'}):
+        item = {
+            'name': x.find('div', attrs={'class': 'wishlistRowItem'}).h4.text,
+            'link': x.find('div', attrs={'class': 'gameListRowLogo'}).a['href']
+        }
+        true_wishlist.append(item)
+
+    return true_wishlist
+
+def getRedditGameDeals():
+    reddit_links = []
+    r = requests.get(gamedeals_url, headers= {'User-Agent': 'Hello'})
+    response = r.json()
+    for x in response['data']['children']:
+        item = {
+            'title': x['data']['title'],
+            'url': x['data']['url']
+        }
+        reddit_links.append(item)
+
+    return reddit_links
+
+print getRedditGameDeals()
