@@ -1,7 +1,7 @@
 
 import os
 
-from sqlalchemy import create_engine, Table, Column, Integer, String, ForeignKey
+from sqlalchemy import create_engine, Table, Column, Integer, String, ForeignKey, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref, sessionmaker
 
@@ -41,7 +41,15 @@ class Game(Base):
 class Price(Base):
     __tablename__ = 'prices'
     id = Column(Integer, primary_key=True)
-    price = Column(Integer)
+    price = Column(Float(default=0, precision=23))
+    discount = Column(Float(default=0, precision=23))
+    def original(self):
+        try :
+            original = int(self.price / (1 - self.discount))
+        except ZeroDivisionError:
+            original = self.price
+        return original
+
     platform_id = Column(Integer, ForeignKey('platforms.id'))
     platform = relationship("Platform")
 
@@ -59,12 +67,13 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 games = [
-    Game(name="A Game", price=Price(price="150", platform=Platform(name="Steam")))
+    Game(name="A Game", price=Price(price=20.00, discount=0.20, platform=Platform(name="Steam")))
 ]
 user = User(name="Alex", password="words", email="ax.schech@gmail.com", games=games)
 session.add(user)
 session.commit()
 
-for instance in session.query(User).all():
-    for game in instance.games:
-        print game.name
+for game in session.query(Game).all():
+    print game.price.price
+    print game.price.discount
+    print game.price.original()
