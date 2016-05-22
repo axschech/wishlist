@@ -24,8 +24,11 @@ class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    email = Column(String)
+    email = Column(String, unique=True)
     password = Column(String)
+    steam_id = Column(Integer, unique=True)
+    humble_id = Column(Integer, unique=True)
+    last_refresh = Column(DateTime)
     games = relationship('Game', secondary=association_table, backref="games")
 
     # def __repr__(self):
@@ -58,22 +61,21 @@ class Platform(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True)
 
-
 Base.metadata.create_all(engine)
 
-print "\nSeeding\n"
-Session = sessionmaker(bind=engine)
+# print "\nSeeding\n"
+# Session = sessionmaker(bind=engine)
 
-session = Session()
+# session = Session()
 
-games = [
-    Game(name="A Game", price=Price(price=20.00, discount=0.20, platform=Platform(name="Steam")))
-]
-user = User(name="Alex", password="words", email="ax.schech@gmail.com", games=games)
-session.add(user)
-session.commit()
+# games = [
+#     Game(name="A Game", price=Price(price=20.00, discount=0.20, platform=Platform(name="Steam")))
+# ]
+# user = User(name="Alex", password="words", email="ax.schech@gmail.com", games=games, steam_id=76561197968229753)
+# session.add(user)
+# session.commit()
 
-for game in session.query(Game).all():
-    print game.price.price
-    print game.price.discount
-    print game.price.original()
+# for game in session.query(Game).all():
+#     print game.price.price
+#     print game.price.discount
+#     print game.price.original()
