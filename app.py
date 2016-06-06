@@ -17,7 +17,7 @@ def games():
     games = []
     for user in db.session.query(db.User).all():
         for game in user.games:
-            games.append(game.name)
+            games.append({'name': game.name, 'price': game.price.price, 'discount': game.price.discount})
     return jsonify(games)
 @app.route("/refresh", methods=['POST'])
 def refresh():
