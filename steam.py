@@ -2,7 +2,7 @@ import requests
 import json
 from bs4 import BeautifulSoup
 
-class Steam:
+class Steam_Engine:
     def __init__(self, id):
         url = 'http://steamcommunity.com/profiles/|/wishlist/'
         self.url = url.replace('|', str(id))
@@ -20,12 +20,7 @@ class Steam:
                 item['price'] = x.find('div', attrs={'class': 'gameListPriceData'}).div.text.strip().replace('$', '')
                 item['discount'] = 0
             else:
-                item['price'] = x.find('div', attrs={'class': 'gameListPriceData', 'class': 'discount_final_price'}).text
+                item['price'] = x.find('div', attrs={'class': 'gameListPriceData', 'class': 'discount_final_price'}).text.replace('$', '')
                 item['discount'] = x.find('div', attrs={'class': 'gameListPriceData', 'class': 'discount_block'}).div.text.replace('-', '.').replace('%', '')
             self.wishlist.append(item)
-
-steam = Steam(76561197968229753)
-steam.get()
-print steam.wishlist
-
 # steam.get()

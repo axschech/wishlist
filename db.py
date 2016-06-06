@@ -1,7 +1,8 @@
 
 import os
+import MySQLdb
 
-from sqlalchemy import create_engine, Table, Column, Integer, String, ForeignKey, Float
+from sqlalchemy import create_engine, Table, Column, Integer, BigInteger, String, ForeignKey, Float, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref, sessionmaker
 
@@ -10,8 +11,14 @@ try:
 except OSError:
     pass
 
-engine = create_engine('sqlite:///db.db', echo=True)
+default_length = 255
+
+engine = create_engine('mysql+mysqldb://root@localhost')
 Base = declarative_base()
+engine.execute('DROP DATABASE wishlist')
+engine.execute('CREATE DATABASE IF NOT EXISTS wishlist')
+
+engine.execute('USE wishlist')
 
 print "\Schema\n"
 
@@ -23,11 +30,11 @@ association_table = Table('users_games', Base.metadata,
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    name = Column(String)
-    email = Column(String, unique=True)
-    password = Column(String)
-    steam_id = Column(Integer, unique=True)
-    humble_id = Column(Integer, unique=True)
+    name = Column(String(default_length))
+    email = Column(String(default_length), unique=True)
+    password = Column(String(default_length))
+    steam_id = Column(BigInteger, unique=True)
+    humble_id = Column(BigInteger, unique=True)
     last_refresh = Column(DateTime)
     games = relationship('Game', secondary=association_table, backref="games")
 
@@ -37,7 +44,7 @@ class User(Base):
 class Game(Base):
     __tablename__ = 'games'
     id = Column(Integer, primary_key=True)
-    name = Column(String, unique=True)
+    name = Column(String(default_length), unique=True)
     price_id = Column(Integer, ForeignKey('prices.id'))
     price = relationship("Price")
 
@@ -59,21 +66,18 @@ class Price(Base):
 class Platform(Base):
     __tablename__ = 'platforms'
     id = Column(Integer, primary_key=True)
-    name = Column(String, unique=True)
+    name = Column(String(default_length), unique=True)
 
 Base.metadata.create_all(engine)
 
 # print "\nSeeding\n"
-# Session = sessionmaker(bind=engine)
+Session = sessionmaker(bind=engine)
 
-# session = Session()
+session = Session()
 
-# games = [
-#     Game(name="A Game", price=Price(price=20.00, discount=0.20, platform=Platform(name="Steam")))
-# ]
-# user = User(name="Alex", password="words", email="ax.schech@gmail.com", games=games, steam_id=76561197968229753)
-# session.add(user)
-# session.commit()
+user = User(name="Alex", password="words", email="ax.schech@gmail.com", steam_id=76561197968229753)
+session.add(user)
+session.commit()
 
 # for game in session.query(Game).all():
 #     print game.price.price
