@@ -1,9 +1,17 @@
 from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
 import steam
 import db
 
 app = Flask(__name__)
+@app.route('/register', methods=['POST'])
+def register():
+    try:
+        user = db.User(name=request.json['name'], password=request.json['password'], email=request.json['email'], steam_id=request.json['steam_id'])
+        db.session.add(user)
+        db.session.commit()
+    except KeyError, e:
+        return jsonify({"Missing": str(e)}), 400
+    return jsonify(request.json['name'])
 @app.route("/games", methods=['GET'])
 def games():
     games = []

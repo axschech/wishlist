@@ -75,9 +75,9 @@ Session = sessionmaker(bind=engine)
 
 session = Session()
 
-user = User(name="Alex", password="words", email="ax.schech@gmail.com", steam_id=76561197968229753)
-session.add(user)
-session.commit()
+# user = User(name="Alex", password="words", email="ax.schech@gmail.com", steam_id=76561197968229753)
+# session.add(user)
+# session.commit()
 
 # for game in session.query(Game).all():
 #     print game.price.price
